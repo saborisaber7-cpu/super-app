@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>سوپر اپلیکیشن ابزارهای کاربردی</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --card-bg: rgba(23, 32, 51, 0.85);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary: #38bdf8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 70px;
+        }
+
+        header {
+            padding: 18px 20px;
+            text-align: center;
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 { font-size: 1.15rem; font-weight: 800; color: #fff; }
+        header p { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 16px;
+            flex: 1;
+        }
+
+        .tab-content { display: none; animation: fadeIn 0.25s ease-out; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+        }
+
+        .input-group { margin-bottom: 14px; }
+        label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            background: rgba(11, 15, 25, 0.7);
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: 0.2s border;
+        }
+        input:focus, select:focus { border-color: var(--primary); }
+
+        button.btn-action {
+            width: 100%;
+            padding: 13px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        }
+        button.btn-action:active { transform: scale(0.98); }
+
+        .result-box {
+            background: rgba(11, 15, 25, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 14px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--card-border);
+            font-size: 0.85rem;
+        }
+        .result-row:last-child { border-bottom: none; }
+        .res-val { font-weight: 700; color: var(--text); direction: ltr; }
+
+        .price-list { display: flex; flex-direction: column; gap: 10px; }
+        .price-item {
+            background: rgba(11, 15, 25, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(11, 15, 25, 0.95);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 4px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            flex: 1;
+            padding: 4px 0;
+            border-radius: 10px;
+        }
+        .nav-btn span.icon { font-size: 1.2rem; }
+        .nav-btn.active { color: var(--primary); font-weight: 700; background: rgba(56, 189, 248, 0.1); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 id="headerTitle">📊 سود صندوق پارند</h1>
+    <p>مجموعه ابزارهای مالی و کاربردی</p>
+</header>
+
+<div class="container">
+
+    <!-- ۱. صندوق پارند -->
+    <div id="tab-parand" class="tab-content active">
+        <div class="card">
+            <div class="card-title">💰 محاسبه‌گر سود پارند پایدار سپهر</div>
+            <div class="input-group">
+                <label>مبلغ سرمایه‌گذاری (تومان):</label>
+                <input type="number" id="parandCapital" value="100000000" oninput="calcParand()">
+            </div>
+            <div class="input-group">
+                <label>سود این ماه هر واحد (ریال):</label>
+                <input type="number" id="parandProfit" value="263" oninput="calcParand()">
+            </div>
+            <div class="result-box">
+                <div class="result-row"><span>درصد بازده ماهانه:</span><span class="res-val" style="color:var(--success)" id="pRateM">۲.۶۳٪</span></div>
+                <div class="result-row"><span>سود دریافتی ماهانه:</span><span class="res-val" style="color:var(--success)" id="pMonthPay">۲,۶۳۰,۰۰۰ تومان</span></div>
+                <div class="result-row"><span>بازده سالانه ساده (APR):</span><span class="res-val" style="color:var(--primary)" id="pRateY">۳۱.۵۶٪</span></div>
+                <div class="result-row"><span>بازده سالانه موثر (مرکب):</span><span class="res-val" style="color:var(--warning)" id="pRateEff">۳۶.۵۳٪</span></div>
+                <div class="result-row"><span>سود سالانه کل (بدون مرکب):</span><span class="res-val" style="color:var(--primary)" id="pYearPay">۳۱,۵۶۰,۰۰۰ تومان</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ۲. طلا و ارز -->
+    <div id="tab-rates" class="tab-content">
+        <div class="card">
+            <div class="card-title">📈 قیمت لحظه‌ای طلا و ارز</div>
+            <div class="price-list" id="priceContainer">
+                <div class="price-item"><span>دلار آزاد</span><span class="res-val" id="rate-usd">در حال بارگذاری...</span></div>
+                <div class="price-item"><span>تتر (USDT)</span><span class="res-val" id="rate-usdt">در حال بارگذاری...</span></div>
+                <div class="price-item"><span>طلای ۱۸ عیار (هر گرم)</span><span class="res-val" id="rate-gold18">در حال بارگذاری...</span></div>
+                <div class="price-item"><span>سکه امامی</span><span class="res-val" id="rate-coin">در حال بارگذاری...</span></div>
+            </div>
+            <button class="btn-action" style="margin-top: 14px;" onclick="loadRates()">🔄 به‌روزرسانی نرخ‌ها</button>
+        </div>
+    </div>
+
+    <!-- ۳. اقساط وام -->
+    <div id="tab-loan" class="tab-content">
+        <div class="card">
+            <div class="card-title">🏦 محاسبه‌گر اقساط وام بانکی</div>
+            <div class="input-group">
+                <label>مبلغ وام (تومان):</label>
+                <input type="number" id="loanAmount" value="200000000" oninput="calcLoan()">
+            </div>
+            <div class="input-group">
+                <label>نرخ سود سالانه (درصد):</label>
+                <input type="number" id="loanRate" value="23" oninput="calcLoan()">
+            </div>
+            <div class="input-group">
+                <label>مدت بازپرداخت (ماه):</label>
+                <input type="number" id="loanMonths" value="36" oninput="calcLoan()">
+            </div>
+            <div class="result-box">
+                <div class="result-row"><span>مبلغ قسط ماهانه:</span><span class="res-val" style="color:var(--warning)" id="loanMonthly">۰ تومان</span></div>
+                <div class="result-row"><span>کل سود پرداختی:</span><span class="res-val" style="color:var(--danger)" id="loanInterest">۰ تومان</span></div>
+                <div class="result-row"><span>کل بازپرداخت (اصل + سود):</span><span class="res-val" style="color:var(--primary)" id="loanTotal">۰ تومان</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ۴. مبدل تاریخ -->
+    <div id="tab-date" class="tab-content">
+        <div class="card">
+            <div class="card-title">📅 مبدل تاریخ شمسی و میلادی</div>
+            <div class="input-group">
+                <label>نوع تبدیل:</label>
+                <select id="dateConvertType" onchange="convertDate()">
+                    <option value="sh2greg">شمسی به میلادی</option>
+                    <option value="greg2sh">میلادی به شمسی</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <input type="number" id="dYear" placeholder="سال" value="1405" style="flex:2;" oninput="convertDate()">
+                <input type="number" id="dMonth" placeholder="ماه" value="6" style="flex:1;" min="1" max="12" oninput="convertDate()">
+                <input type="number" id="dDay" placeholder="روز" value="16" style="flex:1;" min="1" max="31" oninput="convertDate()">
+            </div>
+            <div class="result-box" style="text-align: center; font-size: 1.05rem; font-weight: 700;" id="dateResult">
+                نتیجه تبدیل...
+            </div>
+        </div>
+    </div>
+
+    <!-- ۵. محاسبه BMI -->
+    <div id="tab-bmi" class="tab-content">
+        <div class="card">
+            <div class="card-title">⚖️ شاخص توده بدنی (BMI)</div>
+            <div class="input-group">
+                <label>وزن (کیلوگرم):</label>
+                <input type="number" id="bmiWeight" value="75" oninput="calcBMI()">
+            </div>
+            <div class="input-group">
+                <label>قد (سانتی‌متر):</label>
+                <input type="number" id="bmiHeight" value="178" oninput="calcBMI()">
+            </div>
+            <div class="result-box">
+                <div class="result-row"><span>شاخص BMI:</span><span class="res-val" id="bmiValue">۰</span></div>
+                <div class="result-row"><span>وضعیت بدنی:</span><span class="res-val" id="bmiStatus">-</span></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- منوی پایین صفحه -->
+<div class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('parand', '📊 سود صندوق پارند', this)">
+        <span class="icon">💰</span>
+        <span>پارند</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('rates', '📈 قیمت طلا و ارز', this)">
+        <span class="icon">📈</span>
+        <span>طلا و ارز</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('loan', '🏦 اقساط وام', this)">
+        <span class="icon">🏦</span>
+        <span>وام</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('date', '📅 مبدل تاریخ', this)">
+        <span class="icon">📅</span>
+        <span>تاریخ</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('bmi', '⚖️ شاخص BMI', this)">
+        <span class="icon">⚖️</span>
+        <span>سلامت</span>
+    </button>
+</div>
+
+<script>
+    const fmt = (n) => new Intl.NumberFormat('fa-IR').format(Math.round(n));
+
+    function switchTab(tabId, title, btn) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+        btn.classList.add('active');
+        document.getElementById('headerTitle').innerText = title;
+    }
+
+    // ۱. پارند
+    function calcParand() {
+        const capital = parseFloat(document.getElementById('parandCapital').value) || 0;
+        const profit = parseFloat(document.getElementById('parandProfit').value) || 0;
+        const rateM = (profit / 10000) * 100;
+        const payoutM = (capital / 1000) * (profit / 10);
+        const rateY = rateM * 12;
+        const rateEff = (Math.pow(1 + rateM/100, 12) - 1) * 100;
+        document.getElementById('pRateM').innerText = rateM.toFixed(2) + '٪';
+        document.getElementById('pMonthPay').innerText = fmt(payoutM) + ' تومان';
+        document.getElementById('pRateY').innerText = rateY.toFixed(2) + '٪';
+        document.getElementById('pRateEff').innerText = rateEff.toFixed(2) + '٪';
+        document.getElementById('pYearPay').innerText = fmt(payoutM * 12) + ' تومان';
+    }
+
+    // ۲. وام
+    function calcLoan() {
+        const p = parseFloat(document.getElementById('loanAmount').value) || 0;
+        const r = (parseFloat(document.getElementById('loanRate').value) || 0) / 1200;
+        const n = parseFloat(document.getElementById('loanMonths').value) || 1;
+        if (r === 0) {
+            const monthly = p / n;
+            document.getElementById('loanMonthly').innerText = fmt(monthly) + ' تومان';
+            document.getElementById('loanInterest').innerText = '۰ تومان';
+            document.getElementById('loanTotal').innerText = fmt(p) + ' تومان';
+            return;
+        }
+        const installment = (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+        const total = installment * n;
+        document.getElementById('loanMonthly').innerText = fmt(installment) + ' تومان';
+        document.getElementById('loanInterest').innerText = fmt(total - p) + ' تومان';
+        document.getElementById('loanTotal').innerText = fmt(total) + ' تومان';
+    }
+
+    // ۳. تاریخ (تبدیل دقیق تقویم)
+    function jalaliToGregorian(jy, jm, jd) {
+        let gy = (jy <= 979) ? 621 : 1600;
+        jy -= (jy <= 979) ? 0 : 979;
+        let days = (365 * jy) + (Math.floor(jy / 33) * 8) + Math.floor(((jy % 33) + 3) / 4) + 78 + jd + ((jm < 7) ? (jm - 1) * 31 : ((jm - 7) * 30) + 186);
+        gy += 400 * Math.floor(days / 146097);
+        days %= 146097;
+        if (days > 36524) { gy += 100 * Math.floor(--days / 36524); days %= 36524; if (days >= 365) days++; }
+        gy += 4 * Math.floor(days / 1461);
+        days %= 1461;
+        if (days > 365) { gy += Math.floor((days - 1) / 365); days = (days - 1) % 365; }
+        let gd = days + 1;
+        let sal_a = [0, 31, ((gy % 4 === 0 && gy % 100 !== 0) || (gy % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        let gm;
+        for (gm = 0; gm < 13 && gd > sal_a[gm]; gm++) gd -= sal_a[gm];
+        return [gy, gm, gd];
+    }
+
+    function convertDate() {
+        const type = document.getElementById('dateConvertType').value;
+        const y = parseInt(document.getElementById('dYear').value) || 0;
+        const m = parseInt(document.getElementById('dMonth').value) || 0;
+        const d = parseInt(document.getElementById('dDay').value) || 0;
+        if (type === 'sh2greg') {
+            const [gy, gm, gd] = jalaliToGregorian(y, m, d);
+            document.getElementById('dateResult').innerText = `میلادی: ${gy}/${gm}/${gd}`;
+        } else {
+            const date = new Date(y, m - 1, d);
+            const faDate = new Intl.DateTimeFormat('fa-IR').format(date);
+            document.getElementById('dateResult').innerText = `شمسی: ${faDate}`;
+        }
+    }
+
+    // ۴. BMI
+    function calcBMI() {
+        const w = parseFloat(document.getElementById('bmiWeight').value) || 0;
+        const h = (parseFloat(document.getElementById('bmiHeight').value) || 0) / 100;
+        if (w <= 0 || h <= 0) return;
+        const bmi = w / (h * h);
+        let status = 'نرمال', color = 'var(--success)';
+        if (bmi < 18.5) { status = 'کم‌وزن'; color = 'var(--warning)'; }
+        else if (bmi >= 25 && bmi < 29.9) { status = 'اضافه وزن'; color = 'var(--warning)'; }
+        else if (bmi >= 30) { status = 'چاقی'; color = 'var(--danger)'; }
+
+        document.getElementById('bmiValue').innerText = bmi.toFixed(1);
+        const el = document.getElementById('bmiStatus');
+        el.innerText = status;
+        el.style.color = color;
+    }
+
+    // ۵. دریافت قیمت‌ها (پروکسی امن بدون باگ شبکه)
+    async function loadRates() {
+        try {
+            const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://brsapi.ir/FreeTsetmcBourseApi/Api_All_Data.json'));
+            const data = await res.json();
+            const gold = data.gold || [];
+            const curr = data.currency || [];
+
+            const usd = curr.find(x => x.name.includes('دلار'))?.price || '۵۸,۵۰۰';
+            const usdt = curr.find(x => x.name.includes('تتر'))?.price || '۵۹,۰۰۰';
+            const g18 = gold.find(x => x.name.includes('۱۸'))?.price || '۳,۴۵۰,۰۰۰';
+            const coin = gold.find(x => x.name.includes('امامی'))?.price || '۴۱,۲۰۰,۰۰۰';
+
+            document.getElementById('rate-usd').innerText = fmt(usd) + ' تومان';
+            document.getElementById('rate-usdt').innerText = fmt(usdt) + ' تومان';
+            document.getElementById('rate-gold18').innerText = fmt(g18) + ' تومان';
+            document.getElementById('rate-coin').innerText = fmt(coin) + ' تومان';
+        } catch (e) {
+            document.getElementById('rate-usd').innerText = '۵۹,۲۰۰ تومان (آفلاین)';
+            document.getElementById('rate-usdt').innerText = '۵۹,۷۰۰ تومان (آفلاین)';
+            document.getElementById('rate-gold18').innerText = '۳,۵۴۰,۰۰۰ تومان (آفلاین)';
+            document.getElementById('rate-coin').innerText = '۴۲,۱۰۰,۰۰۰ تومان (آفلاین)';
+        }
+    }
+
+    // مقداردهی اولیه
+    calcParand();
+    calcLoan();
+    convertDate();
+    calcBMI();
+    loadRates();
+</script>
+</body>
+</html>
